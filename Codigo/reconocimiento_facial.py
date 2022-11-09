@@ -14,31 +14,35 @@ import wandb
 from wandb.keras import WandbCallback
 
 df = pd.read_csv('attr_celeba_prepared1.txt', sep=' ',header=None)
-df_red = df.sample(frac=0.5)
+df_red = df.sample(frac=0.05)
 df_train, df_test = train_test_split(df_red, test_size = 0.2)
-
+df_train = df_train.reset_index(drop=True)
+df_test = df_test.reset_index(drop=True)
 
 files_train = tf.data.Dataset.from_tensor_slices(df_train[0])
-attributes_train = tf.data.Dataset.from_tensor_slices(df_train.iloc[:,1:].to_numpy())
-data_train = tf.data.Dataset.zip((files_train,attributes_train))
+#attributes_train = df_train.iloc[:,1:]
+y_train = tf.convert_to_tensor([df_train.iloc[:,1:].iloc[i,:].tolist() for i in range(len(df_train))])
+#data_train = tf.data.Dataset.zip((files_train,attributes_train))
 
 files_test = tf.data.Dataset.from_tensor_slices(df_test[0])
-attributes_test = tf.data.Dataset.from_tensor_slices(df_test.iloc[:,1:].to_numpy())
-data_test = tf.data.Dataset.zip((files_test,attributes_test))
+y_test = tf.convert_to_tensor([df_test.iloc[:,1:].iloc[i,:].tolist() for i in range(len(df_test))])
+#attributes_test = tf.data.Dataset.from_tensor_slices(df_test.iloc[:,1:].to_numpy())
+#data_test = tf.data.Dataset.zip((files_test,attributes_test))
 
 path_to_images = r'C:\\Users\\erjo_\Downloads\\img_align_celeba\\'
-def process_file(file_name,attributes):
+def process_file(file_name):
     image = tf.io.read_file(path_to_images+file_name)
     image = tf.image.decode_jpeg(image,channels=3)
     image = tf.image.resize(image, [192,192])
     image /= 255.0
     image = tf.expand_dims(image,axis=0)
-    attributes = tf.reshape(attributes,[1,40])
-    return [image, attributes]
+    return tf.reshape(image,[192,192,3])
 
 
-train_images = data_train.map(process_file)
-test_images = data_test.map(process_file)
+train_images = tf.convert_to_tensor([process_file(i) for i in files_train])
+test_images = tf.convert_to_tensor([process_file(i) for i in files_test])
+#train_images = tf.reshape(train_images,[len(),190,190,10])
+#test_images = tf.reshape(test_images,[1,190,190,10])
 
 #for image, attri in train_images.take(2):
 #    plt.imshow(image)
@@ -91,16 +95,19 @@ model.compile(loss='binary_crossentropy',
               optimizer=opt,
               metrics=['accuracy'],)
 #history = model.fit(train_images,batch_size=batch_size,epochs=epochs,verbose=1,validation_data=(test_images), callbacks=[WandbCallback()])
-log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tbCallBack = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True, write_images=True)
+#log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+#tbCallBack = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True, write_images=True)
 
-model.fit_generator(
-                train_images,
-                steps_per_epoch=epoch_steps,
-                epochs=epochs,
-                validation_data=test_images,
-                validation_steps=test_steps,
-                callbacks=[tbCallBack]
-                )
+#model.fit_generator(
+#                train_images,
+#                steps_per_epoch=epoch_steps,
+#                epochs=epochs,
+#                validation_data=test_images,
+#                validation_steps=test_steps,
+#                callbacks=[tbCallBack]
+#                )
 #score = model.evaluate(test_images, verbose=0)
 #print(score)
+history = model.fit(x=train_images, y=y_train,batch_size=batch_size,epochs=epochs,verbose=1,validation_data=(test_images,y_test), callbacks=[WandbCallback()])
+score = model.evaluate(x=test_images, y=y_test, verbose=0)
+print(score)
