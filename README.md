@@ -24,11 +24,9 @@ no eran iterables. Buscando en internet alguna solución encontré que debía de
 de dichas capas usando el nombre de la variable asignada a cada una, en internet econtré la función exec() que me ayudó a hacer todo el proceso con un ciclo for. 
 Así la entrené tres veces pero no vi una mejoría en la precisión. Guardé el modelo final como modelo_final.h5.
 
-Para el reconocimiento facial, por falta de tiempo no pude hacer un dataset con fotos mías. Busqué en internet algun dataset que contuviera fotos de una sola persona pero
-no encontré muchos. Buscando en kaggle encontré un dataset que contenía imagenes de los personajes de Los Simpson. Usé las imágenes de Homero como la persona que la red
-debe reconocer y mezclé imaganes de otros personajes en otra carpeta. Con un ciclo for cargué las imagenes y le asigné un 1 a las imágenes de Homero y un 0 a las 
-imágenes de los demás personajes. Cargué la red que había entrenado con los datos de Celeba pero ahora no sabía como deshabilitar el entrenamiento en todas las capas
-menos en la capa de salida. De nuevo, buscando en internet encontré la función model.summary() que muestra el nombre de todas las capas del modelo. Al final no sirvió
-mucho pues el código que venía en el PDF de la tarea sí me funcionó esta vez. Al entrenar la red me marcó un error en las dimensiones de los datos. No sabía como 
-arreglarlo. Investigando encontré la función ImageDataGenerator de tensorflow que crea nuevas imágenes, al usar está función en el entrenamiento de la red se solucionó
-el error. Obtuve una precisión similar a la obtenida al usar los datos de Celeba.
+Para el reconocimiento facial, por falta de tiempo no pude hacer un dataset con fotos mías. Busqué en internet algun dataset que contuviera fotos de una sola persona pero no encontré muchos. Buscando en kaggle (https://www.kaggle.com/datasets/alexattia/the-simpsons-characters-dataset?resource=download) encontré un dataset que contenía imagenes de los personajes de Los Simpson. Usé las imágenes de Homero como la persona que la reddebe reconocer y mezclé imaganes de otros personajes en otra carpeta. Con un ciclo for cargué las imagenes y le asigné un 1 a las imágenes de Homero y un 0 a las imágenes de los demás personajes. 
+Cargué la red que había entrenado con los datos de Celeba pero ahora no sabía como deshabilitar el entrenamiento en todas las capas menos en la capa de salida. De nuevo, buscando en internet encontré la función model.summary() que muestra el nombre de todas las capas del modelo. Al final no sirvió mucho pues el código que venía en el PDF de la tarea sí me funcionó esta vez. Al entrenar la red me marcó un error en las dimensiones de los datos. 
+No sabía como arreglarlo. Investigando encontré la función ImageDataGenerator de tensorflow que crea nuevas imágenes, al usar está función en el entrenamiento de la red se solucionó el error. Obtuve una precisión similar a la obtenida al usar los datos de Celeba.
+Las capturas de pantalla del entrenamiento se encuentran en el repositorio, "entrenamiento de red.PNG" es el primer entrenamiento de la red con datos de Celeba, 
+"entrenamiento de clasificador.PNG" es cuando solo se entrenó el clasificador y "re-entrenamiento de red.PNG" es cuando se volvió a entrenar la red completa.
+"entrenamiento de red con simpson_dataset.PNG" es el entrenamiento de la red con las imágenes de Los Simpson.
